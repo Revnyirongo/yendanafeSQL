@@ -1,0 +1,1 @@
+SELECT parent_parent_parent_name, count(distinct(x.uuid)) FROM public.temp_chw_hierarchy x group by x.parent_parent_parent_name 
