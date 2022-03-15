@@ -1,0 +1,25 @@
+/*TB Clients actively enrolled*/
+SELECT tch.parent_parent_parent_name, count(distinct(x.patient_id)) FROM public.temp_useview_over_5_screening x
+join temp_chw_hierarchy tch on 
+x.reported_by = tch.uuid where x.reported between '2022-02-01' and '2022-02-28'
+and x.is_in_tb IN ('yes')
+group by tch.parent_parent_parent_name 
+
+
+/*At home and on the way births across facilities*/
+select tch.parent_parent_parent_name,count(distinct(x.patient_id)) FROM public.temp_useview_delivery x join temp_chw_hierarchy tch on 
+x.reported_by = tch.uuid where x.delivery_date between '2022-02-01' and '2022-02-28' and x.delivery_place in ('home','on_the_way')
+group by tch.parent_parent_parent_name 
+
+/*Accompanied for 1st ANC*/
+SELECT tch.parent_parent_parent_name,count(distinct(x.patient_id)) FROM public.temp_useview_pregnancy x join temp_chw_hierarchy tch on 
+x.reported_by = tch.uuid
+where x.anc_1 between '2022-02-01' and '2022-02-28'
+and x.refer_and_accompany = 'yes'
+group by tch.parent_parent_parent_name 
+
+/*Time Bound; Using Contact View Metada to Calculate all households exclusive of muted*/
+SELECT ch.parent_parent_parent_name, count(distinct(x.contact_uuid)) FROM public.temp_contactview_metadata x join chw_hierarchy ch
+on x.parent_uuid = ch.parent_uuid WHERE x.contact_type IN ('household') and x.reported <= '2022-02-28' and (x.muted isnull or x.muted >= '2022-02-28')
+group by ch.parent_parent_parent_name
+
